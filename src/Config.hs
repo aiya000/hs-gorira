@@ -8,6 +8,7 @@ import Data.ByteString hiding (readFile)
 import Web.Authenticate.OAuth (OAuth ())
 
 
+-- For Serialize to file
 data TwitterAccessTokens = TwitterAccessTokens
   { accessToken       :: ByteString
   , accessTokenSecret :: ByteString
