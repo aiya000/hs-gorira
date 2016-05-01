@@ -4,15 +4,15 @@ module Config
   , readOAuth
   , readAccessTokens
   ) where
-import Data.ByteString hiding (readFile)
-import Web.Authenticate.OAuth (OAuth ())
+import Data.ByteString hiding ( readFile )
+import Web.Authenticate.OAuth ( OAuth () )
 
 
 -- For Serialize to file
 data TwitterAccessTokens = TwitterAccessTokens
   { accessToken       :: ByteString
   , accessTokenSecret :: ByteString
-  } deriving (Show, Read)
+  } deriving (Read)
 
 readOAuth :: IO OAuth
 readOAuth = do
