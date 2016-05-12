@@ -2,7 +2,7 @@
 module Main where
 import Config
 import Control.GoriraTwitter
-import Control.Monad.Trans.Resource ( runResourceT )
+import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
 
 newCredential' :: TwitterAccessTokens -> Credential
@@ -13,7 +13,13 @@ newCredential' accessTokens =
 
 main :: IO ()
 main = do
-  oauth        <- readOAuth
-  accessTokens <- readAccessTokens
+  oauth         <- readOAuth
+  accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
-  runResourceT $ tweet "Hello, world!! from Haskell" oauth credential
+  maybeTimeline <- fetchPublicTimeline oauth credential
+  dummy maybeTimeline
+  return ()
+
+dummy :: Maybe HomeTimeline -> IO ()
+dummy Nothing         = putStrLn "dame"
+dummy (Just timeline) = print timeline
