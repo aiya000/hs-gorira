@@ -2,10 +2,10 @@
 module Main where
 import Config
 import Control.GoriraTwitter
+import Control.Monad ( forM_ )
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
 import qualified Data.Text.IO as TIO
-import Control.Monad ( forM_ )
 
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
@@ -20,10 +20,7 @@ main = do
   let credential = newCredential' accessTokens
   maybeTimeline <- fetchPublicTimeline oauth credential "aiya_000"
   tlView maybeTimeline
-  return ()
 
 tlView :: Maybe Timeline -> IO ()
-tlView Nothing         = putStrLn "dame"
-tlView (Just timeline) = do
-  forM_ timeline $ \t -> do
-    TIO.putStrLn . text $ t
+tlView Nothing         = fail "connection error"
+tlView (Just timeline) = mapM_ TIO.putStrLn . map text $ timeline
