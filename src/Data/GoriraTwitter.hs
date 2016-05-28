@@ -1,19 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Data.GoriraTwitter
-  ( HomeTimelineItem (..)
-  , HomeTimeline
+  ( TimelineItem (..)
+  , Timeline
   , TweetMessage
+  , TwitterScreenName
   ) where
 import Data.Aeson ( FromJSON (..), Value (..), (.:) )
 import Data.Text ( Text () )
 import Data.ByteString ( ByteString () )
 
-data HomeTimelineItem = HomeTimelineItem
+-- The data type of "https://api.twitter.com/1.1/statuses/home_timeline.json" and other twitter jsons
+data TimelineItem = TimelineItem
   { text :: Text
   } deriving ( Show )
-instance FromJSON HomeTimelineItem where
-  parseJSON (Object v) = HomeTimelineItem <$> v .: "text"
+instance FromJSON TimelineItem where
+  parseJSON (Object v) = TimelineItem <$> v .: "text"
 
-type HomeTimeline = [HomeTimelineItem]
-
-type TweetMessage = ByteString
+type Timeline          = [TimelineItem]
+type TweetMessage      = ByteString
+type TwitterScreenName = String

@@ -4,6 +4,8 @@ import Config
 import Control.GoriraTwitter
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
+import qualified Data.Text.IO as TIO
+import Control.Monad ( forM_ )
 
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
@@ -16,10 +18,12 @@ main = do
   oauth         <- readOAuth
   accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
-  maybeTimeline <- fetchPublicTimeline oauth credential
-  dummy maybeTimeline
+  maybeTimeline <- fetchPublicTimeline oauth credential "aiya_000"
+  tlView maybeTimeline
   return ()
 
-dummy :: Maybe HomeTimeline -> IO ()
-dummy Nothing         = putStrLn "dame"
-dummy (Just timeline) = print timeline
+tlView :: Maybe Timeline -> IO ()
+tlView Nothing         = putStrLn "dame"
+tlView (Just timeline) = do
+  forM_ timeline $ \t -> do
+    TIO.putStrLn . text $ t

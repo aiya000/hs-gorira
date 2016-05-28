@@ -24,10 +24,10 @@ tweet message oauth credential = do
   print $ responseBody response
 
 
-fetchPublicTimeline :: OAuth -> Credential -> IO (Maybe HomeTimeline)
-fetchPublicTimeline oauth credential = do
+fetchPublicTimeline :: OAuth -> Credential -> TwitterScreenName -> IO (Maybe Timeline)
+fetchPublicTimeline oauth credential screenName = do
   manager        <- newManager tlsManagerSettings
-  requestForGet  <- parseUrl "https://api.twitter.com/1.1/statuses/home_timeline.json"
+  requestForGet  <- parseUrl $ "https://api.twitter.com/1.1/statuses/user_timeline.json?include_rts=false&screen_name=" ++ screenName
   signedRequest  <- signOAuth oauth credential requestForGet
   response       <- httpLbs signedRequest manager
   return . decode . responseBody $ response
