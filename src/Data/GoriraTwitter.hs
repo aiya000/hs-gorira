@@ -18,4 +18,4 @@ instance FromJSON TimelineItem where
 
 type Timeline          = [TimelineItem]
 type TweetMessage      = ByteString
-type TwitterScreenName = String
+type TwitterScreenName = ByteString

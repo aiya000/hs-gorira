@@ -6,7 +6,7 @@ module Control.GoriraTwitter
 import Data.Aeson ( decode )
 import Data.Conduit ( ($$+-) )
 import Data.GoriraTwitter
-import Network.HTTP.Conduit ( newManager, parseUrl, http, urlEncodedBody, responseBody, tlsManagerSettings, httpLbs )
+import Network.HTTP.Conduit ( newManager, parseUrl, setQueryString, http, urlEncodedBody, responseBody, tlsManagerSettings, httpLbs )
 import System.IO ( stdout )
 import Web.Authenticate.OAuth ( Credential (), signOAuth, OAuth )
 import qualified Data.Conduit.Binary as CBinary
@@ -26,7 +26,11 @@ postTweet message oauth credential = do
 fetchPublicTimeline :: OAuth -> Credential -> TwitterScreenName -> IO (Maybe Timeline)
 fetchPublicTimeline oauth credential screenName = do
   manager        <- newManager tlsManagerSettings
-  requestForGet  <- parseUrl $ "https://api.twitter.com/1.1/statuses/user_timeline.json?include_rts=false&screen_name=" ++ screenName
+  requestModel   <- parseUrl "https://api.twitter.com/1.1/statuses/user_timeline.json"
+  let requestForGet = setQueryString [ ("include_rts", Just "false")
+                                     , ("count",       Just "80")
+                                     , ("screen_name", Just screenName)
+                                     ] requestModel
   signedRequest  <- signOAuth oauth credential requestForGet
   response       <- httpLbs signedRequest manager
   return . decode . responseBody $ response
