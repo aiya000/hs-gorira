@@ -23,4 +23,4 @@ main = do
 
 tlView :: Maybe Timeline -> IO ()
 tlView Nothing         = fail "connection error"
-tlView (Just timeline) = mapM_ TIO.putStrLn . map text $ timeline
+tlView (Just timeline) = mapM_ (TIO.putStrLn . text) timeline
