@@ -1,4 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
+
+-- These data type definitions for Twitter API
+
 module Data.GoriraTwitter
   ( TimelineItem (..)
   , Timeline
@@ -12,10 +15,12 @@ import Data.ByteString ( ByteString () )
 -- The data type of "https://api.twitter.com/1.1/statuses/home_timeline.json" and other twitter jsons
 data TimelineItem = TimelineItem
   { text :: Text
-  } deriving ( Show )
+  } deriving ( Show, Read )
+  -- TODO: deriving Show only
+  --} deriving ( Show )
 instance FromJSON TimelineItem where
   parseJSON (Object v) = TimelineItem <$> v .: "text"
 
 type Timeline          = [TimelineItem]
-type TweetMessage      = ByteString
+type TweetMessage      = Text
 type TwitterScreenName = ByteString

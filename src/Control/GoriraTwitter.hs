@@ -1,11 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
+
+-- This module for Access to Twitter API
+
 module Control.GoriraTwitter
   ( postTweet
-  , fetchPublicTimeline
+  , fetchUserTimeline
   ) where
 import Data.Aeson ( decode )
 import Data.Conduit ( ($$+-) )
 import Data.GoriraTwitter
+import Data.Text.Encoding ( encodeUtf8 )
 import Network.HTTP.Conduit ( newManager, parseUrl, setQueryString, http, urlEncodedBody, responseBody, tlsManagerSettings, httpLbs )
 import System.IO ( stdout )
 import Web.Authenticate.OAuth ( Credential (), signOAuth, OAuth )
@@ -13,18 +17,18 @@ import qualified Data.Conduit.Binary as CBinary
 
 
 -- TODO: return tweet status ( succeed or failed :: Bool )
-postTweet :: TweetMessage -> OAuth -> Credential -> IO ()
-postTweet message oauth credential = do
+postTweet :: OAuth -> Credential -> TweetMessage -> IO ()
+postTweet oauth credential message = do
   manager       <- newManager tlsManagerSettings
   request       <- parseUrl "https://api.twitter.com/1.1/statuses/update.json"
-  let requestForPost = urlEncodedBody [("status", message)] request
+  let requestForPost = urlEncodedBody [("status", encodeUtf8 message)] request
   signedRequest <- signOAuth oauth credential requestForPost
   response      <- httpLbs signedRequest manager
   print $ responseBody response
 
 
-fetchPublicTimeline :: OAuth -> Credential -> TwitterScreenName -> IO (Maybe Timeline)
-fetchPublicTimeline oauth credential screenName = do
+fetchUserTimeline :: OAuth -> Credential -> TwitterScreenName -> IO (Maybe Timeline)
+fetchUserTimeline oauth credential screenName = do
   manager        <- newManager tlsManagerSettings
   requestModel   <- parseUrl "https://api.twitter.com/1.1/statuses/user_timeline.json"
   let requestForGet = setQueryString [ ("include_rts", Just "false")

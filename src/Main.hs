@@ -1,11 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 import Config
+import Control.GoriraMeCab
 import Control.GoriraTwitter
-import Control.Monad ( forM_ )
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
+
+-- temporary
+import Data.Maybe ( fromJust )
+import Control.Monad ( forM_ )
 import qualified Data.Text.IO as TIO
+import qualified Data.Text as T
+--
 
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
@@ -18,13 +24,6 @@ main = do
   oauth         <- readOAuth
   accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
-  maybeTimeline <- fetchPublicTimeline oauth credential "aiya_000"
-  tlView maybeTimeline
-
-tlView :: Maybe Timeline -> IO ()
-tlView Nothing         = fail "connection error"
-tlView (Just timeline) = do
-  putStrLn $ "tweet count: " ++ (show . length $ timeline)
-  forM_ timeline $ \tweet -> do
-    putStrLn "- - - - -"
-    TIO.putStrLn (text tweet)
+  maybeTimeline <- fetchUserTimeline oauth credential "aiya_000"
+  tweetMessage <- generateTweet $ fromJust maybeTimeline
+  postTweet oauth credential tweetMessage
