@@ -6,13 +6,6 @@ import Control.GoriraTwitter
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
 
--- temporary
-import Data.Maybe ( fromJust )
-import Control.Monad ( forM_ )
-import qualified Data.Text.IO as TIO
-import qualified Data.Text as T
---
-
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
   let accessTokenValue       = accessToken accessTokens
@@ -25,5 +18,9 @@ main = do
   accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
   maybeTimeline <- fetchUserTimeline oauth credential "aiya_000"
-  tweetMessage <- generateTweet $ fromJust maybeTimeline
-  postTweet oauth credential tweetMessage
+  case maybeTimeline of
+    Nothing       -> fail "failed fetching tweets"
+    Just timeline -> do
+      tweetMessage <- generateTweet timeline
+      postTweet oauth credential tweetMessage
+      --print tweetMessage
