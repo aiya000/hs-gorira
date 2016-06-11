@@ -69,7 +69,7 @@ toChainable xs  = zipWith ChainableWords xs' (tail xs')
 chainWords :: [ChainableWords] -> Text
 chainWords []  = error "aho"
 chainWords [x] = toText x
-chainWords xs  = toText . foldl1 chain . dropWhile hasBegin $ xs
+chainWords xs  = toText . foldl1 chain . dropWhile (not . hasBegin) $ xs
   where
     chain :: ChainableWords -> ChainableWords -> ChainableWords
     chain a@(ChainableWords _ y1) b@(ChainableWords _ y2)
