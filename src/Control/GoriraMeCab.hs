@@ -26,9 +26,9 @@ isEnd _       = False
 
 type PositionTextCons = (Text -> PositionText)
 getPosition :: PositionText -> PositionTextCons
-getPosition (Begin _)  = Begin
+getPosition (Begin  _) = Begin
 getPosition (Middle _) = Middle
-getPosition (End _)    = End
+getPosition (End    _) = End
 
 
 data ChainableWords = ChainableWords PositionText PositionText deriving (Show)
