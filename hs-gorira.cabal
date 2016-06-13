@@ -28,9 +28,6 @@ executable hs-gorira
                      , conduit
                      , conduit-extra
                      , connection
-                     , http-client
                      , http-conduit
-                     , lens-aeson
-                     , resourcet
-                     , text
                      , sentence-jp
+                     , text
