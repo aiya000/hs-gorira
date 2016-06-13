@@ -23,4 +23,3 @@ main = do
     Just timeline -> do
       tweetMessage <- generateTweet timeline
       postTweet oauth credential tweetMessage
-      --print tweetMessage

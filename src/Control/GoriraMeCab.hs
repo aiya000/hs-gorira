@@ -10,17 +10,21 @@ import Data.Text ( Text () )
 import Prelude hiding ( foldl1 )
 import System.Random.Shuffle ( shuffleM )
 import Text.MeCab ( new, parseToNodes, Node (..) )
+import Control.Monad.IO.Class ( MonadIO (), liftIO )
 
 
 generateTweet :: Timeline -> IO TweetMessage
 generateTweet timeline = do
   let tweets = map text timeline
-  mecab <- new ["mecab"]
-  nodes <- mapM (parseToNodes mecab) tweets
+  generateSentence tweets
+
+generateSentence :: MonadIO m => [Text] -> m Text
+generateSentence sources = do
+  mecab      <- liftIO . new $ ["mecab"]
+  nodes      <- liftIO . mapM (parseToNodes mecab) $ sources
   let sentences = map (toChainable . filter (/= "") . map nodeSurface) $ nodes
-  sentences' <- shuffleM . concat $ sentences
-  let tweetMessage = chainWords sentences'
-  return tweetMessage
+  sentences' <- liftIO . shuffleM . concat $ sentences
+  return . chainWords $ sentences'
 
 toChainable :: [Text] -> [ChainableWords]
 toChainable [x] = [ChainableWords (Begin x) (End "")]
