@@ -18,7 +18,6 @@ executable hs-gorira
   other-modules:       Config
                      , Control.GoriraMeCab
                      , Control.GoriraTwitter
-                     , Data.GoriraMeCab
                      , Data.GoriraTwitter
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
@@ -32,8 +31,6 @@ executable hs-gorira
                      , http-client
                      , http-conduit
                      , lens-aeson
-                     , mecab
-                     , random-shuffle
                      , resourcet
                      , text
-                     , transformers
+                     , sentence-jp
