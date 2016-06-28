@@ -1,11 +1,17 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Control.GoriraMeCab
   ( generateTweet
   ) where
 
-import Data.GoriraTwitter
 import Control.SentenceJP ( generateSentence )
+import Data.GoriraTwitter
+import Data.Text ( replace )
 
-generateTweet :: Timeline -> IO TweetMessage
-generateTweet timeline = do
+generateTweet :: Timeline -> Bool -> IO TweetMessage
+generateTweet timeline allowReplying = do
   let tweets = map text timeline
-  generateSentence tweets
+  case allowReplying of
+       True  -> generateSentence tweets
+       False -> do
+         sentence <- generateSentence tweets
+         return . replace "@" "reply_to_" $ sentence

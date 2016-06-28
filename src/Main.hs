@@ -21,5 +21,5 @@ main = do
   case maybeTimeline of
     Nothing       -> fail "failed fetching tweets"
     Just timeline -> do
-      tweetMessage <- generateTweet timeline
+      tweetMessage <- generateTweet timeline False
       postTweet oauth credential tweetMessage
