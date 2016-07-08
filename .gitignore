@@ -1,3 +1,4 @@
 .stack-work/
 resource/twitter_oauth
 resource/twitter_access_tokens
+tweets.sqlite3

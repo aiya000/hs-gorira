@@ -7,9 +7,8 @@ import Control.SentenceJP ( generateSentence )
 import Data.GoriraTwitter
 import Data.Text ( replace )
 
-generateTweet :: Timeline -> Bool -> IO TweetMessage
-generateTweet timeline allowReplying = do
-  let tweets = map text timeline
+generateTweet :: [TweetMessage] -> Bool -> IO TweetMessage
+generateTweet tweets allowReplying =
   case allowReplying of
        True  -> generateSentence tweets
        False -> do

@@ -15,9 +15,7 @@ import Data.ByteString ( ByteString () )
 -- The data type of "https://api.twitter.com/1.1/statuses/home_timeline.json" and other twitter jsons
 data TimelineItem = TimelineItem
   { text :: Text
-  } deriving ( Show, Read )
-  -- TODO: deriving Show only
-  --} deriving ( Show )
+  } deriving ( Show )
 instance FromJSON TimelineItem where
   parseJSON (Object v) = TimelineItem <$> v .: "text"
 

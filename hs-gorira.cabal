@@ -16,6 +16,7 @@ executable hs-gorira
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Config
+                     , Control.GoriraDB
                      , Control.GoriraMeCab
                      , Control.GoriraTwitter
                      , Data.GoriraTwitter
@@ -29,5 +30,9 @@ executable hs-gorira
                      , conduit-extra
                      , connection
                      , http-conduit
+                     , persistent
+                     , persistent-sqlite
+                     , persistent-template
                      , sentence-jp
                      , text
+                     , transformers
