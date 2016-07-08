@@ -17,6 +17,7 @@ import qualified Data.Conduit.Binary as CBinary
 
 
 -- TODO: return tweet status ( succeed or failed :: Bool )
+-- Post a tweet
 postTweet :: OAuth -> Credential -> TweetMessage -> IO ()
 postTweet oauth credential message = do
   manager       <- newManager tlsManagerSettings
@@ -27,6 +28,7 @@ postTweet oauth credential message = do
   print $ responseBody response
 
 
+-- Fetch screenName's tweets as Timeline
 fetchUserTimeline :: OAuth -> Credential -> TwitterScreenName -> IO (Maybe Timeline)
 fetchUserTimeline oauth credential screenName = do
   manager        <- newManager tlsManagerSettings

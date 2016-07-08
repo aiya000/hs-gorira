@@ -6,6 +6,7 @@ import Control.GoriraTwitter
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth ( Credential (), newCredential )
 
+-- Generate credential from oauth and token
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
   let accessTokenValue       = accessToken accessTokens
