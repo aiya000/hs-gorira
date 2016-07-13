@@ -16,6 +16,7 @@ executable hs-gorira
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Config
+                     , CmdOption
                      , Control.GoriraDB
                      , Control.GoriraMeCab
                      , Control.GoriraTwitter
@@ -26,6 +27,7 @@ executable hs-gorira
                      , aeson
                      , authenticate-oauth
                      , bytestring
+                     , cmdargs
                      , conduit
                      , conduit-extra
                      , connection

@@ -40,7 +40,7 @@ addTweetToDB tweet = runSqlite dbFile $ do
 -- Read all record from dbFile's TweetCache table
 selectAllRecord = do
   runMigration migrateAll
-  xs  <- selectList [] []
+  xs  <- selectList [] []  --TODO: integrate duplicated records to one record
   return (xs :: [Entity TweetCache])
 
 -- Read [TweetMessage] from local DB
