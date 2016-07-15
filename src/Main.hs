@@ -9,7 +9,9 @@ import Control.GoriraMeCab
 import Control.GoriraTwitter
 import Control.Monad (forM_)
 import Data.GoriraTwitter
+import Data.Set ((\\))
 import System.Console.CmdArgs (cmdArgs)
+import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
 
 
@@ -41,12 +43,13 @@ goriraTweet twitterAuth timeline count = do
     putStrLn "\nThis message was posted: vvv"
     TIO.putStrLn tweetMessage
   putStrLn "\nThese tweet to cache: vvv"
-  cacheFetchedTweets tweets
+  cacheFetchedTweets tweets localMessages
 
--- Cache read tweets
-cacheFetchedTweets :: [TweetMessage] -> IO ()
-cacheFetchedTweets tweets = do
-  forM_ tweets $ \tweet -> do
+-- Cache "read tweets - exists records"
+cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()
+cacheFetchedTweets tweets existsTweets = do
+  let tweets' = Set.fromList tweets \\ Set.fromList existsTweets
+  forM_ tweets' $ \tweet -> do
     TIO.putStrLn tweet
     addTweetToDB tweet
 
