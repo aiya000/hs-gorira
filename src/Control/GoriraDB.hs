@@ -8,7 +8,8 @@
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
 module Control.GoriraDB
-  ( addTweetToDB
+  ( prepareGoriraDB
+  , addTweetToDB
   , readDBTweets
   ) where
 
@@ -18,7 +19,6 @@ import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
 
-import Control.Monad.IO.Class (liftIO)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 TweetCache
@@ -30,17 +30,19 @@ dbFile :: Text
 dbFile = "tweets.sqlite3"
 
 
+-- You must call this function before using this module functions
+prepareGoriraDB :: IO ()
+prepareGoriraDB = runSqlite dbFile $ runMigration migrateAll
+
 -- Add TweetMessage to local DB
 addTweetToDB :: TweetMessage -> IO ()
 addTweetToDB tweet = runSqlite dbFile $ do
-  runMigration migrateAll
   insert $ TweetCache tweet
   return ()
 
 -- Read all record from dbFile's TweetCache table
 selectAllRecord = do
-  runMigration migrateAll
-  xs  <- selectList [] []  --TODO: integrate duplicated records to one record
+  xs <- selectList [] []
   return (xs :: [Entity TweetCache])
 
 -- Read [TweetMessage] from local DB

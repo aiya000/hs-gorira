@@ -30,6 +30,7 @@ goriraTweet :: TwitterAuth -> Timeline -> Int -> IO ()
 goriraTweet twitterAuth timeline count = do
   -- Generate new tweetMessage from fetched data and DB data,
   -- and Post tweetMessage to twitter
+  prepareGoriraDB
   let tweets  = map text timeline
   localMessages <- readDBTweets
   let tweets' = localMessages ++ tweets
