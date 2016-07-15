@@ -37,7 +37,7 @@ goriraTweet twitterAuth timeline count = do
   forM_ [1 .. count] $ \_ -> do
     tweetMessage <- generateTweet tweets' False
     postTweet twitterAuth tweetMessage
-    putStrLn "\nThese tweet to cache: vvv"
+  putStrLn "\nThese tweet to cache: vvv"
   cacheFetchedTweets tweets
 
 -- Cache read tweets
