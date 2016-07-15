@@ -3,12 +3,14 @@ module Main where
 
 import CmdOption
 import Config
+import Control.Exception (SomeException, catch)
 import Control.GoriraDB
 import Control.GoriraMeCab
 import Control.GoriraTwitter
-import Control.Monad ( forM_ )
+import Control.Monad (forM_)
 import Data.GoriraTwitter
-import System.Console.CmdArgs ( cmdArgs )
+import System.Console.CmdArgs (cmdArgs)
+import qualified Data.Maybe as DMaybe
 import qualified Data.Text.IO as TIO
 
 
@@ -36,7 +38,9 @@ goriraTweet twitterAuth timeline count = do
   let tweets' = localMessages ++ tweets
   forM_ [1 .. count] $ \_ -> do
     tweetMessage <- generateTweet tweets' False
-    postTweet twitterAuth tweetMessage
+    postTweet twitterAuth tweetMessage `catch` printTweetError
+    putStrLn "\nThis message was posted: vvv"
+    TIO.putStrLn tweetMessage
   putStrLn "\nThese tweet to cache: vvv"
   cacheFetchedTweets tweets
 
@@ -46,3 +50,9 @@ cacheFetchedTweets tweets = do
   forM_ tweets $ \tweet -> do
     TIO.putStrLn tweet
     addTweetToDB tweet
+
+-- Print cought error to console
+printTweetError :: SomeException -> IO ()
+printTweetError e = do
+  putStrLn "\nhs-gorira cought tweeting error: vvv"
+  print e

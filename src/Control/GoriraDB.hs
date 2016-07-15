@@ -20,12 +20,14 @@ import Database.Persist.Sqlite
 import Database.Persist.TH
 
 
+-- Define data type and function dynamically
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 TweetCache
     tweetMessage TweetMessage
     deriving Show
 |]
 
+-- The App's DB file
 dbFile :: Text
 dbFile = "tweets.sqlite3"
 

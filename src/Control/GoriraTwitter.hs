@@ -8,6 +8,7 @@ module Control.GoriraTwitter
   ) where
 
 import Data.Aeson ( decode )
+import Data.ByteString.Lazy.Char8 ( unpack )
 import Data.Conduit ( ($$+-) )
 import Data.GoriraTwitter
 import Data.Text.Encoding ( encodeUtf8 )
@@ -17,16 +18,16 @@ import Web.Authenticate.OAuth ( Credential (), signOAuth, OAuth )
 import qualified Data.Conduit.Binary as CBinary
 
 
--- TODO: return tweet status ( succeed or failed :: Bool )
 -- Post a tweet
+-- and return posted tweet message if succeed
 postTweet :: TwitterAuth -> TweetMessage -> IO ()
 postTweet (TwitterAuth oauth credential) message = do
   manager       <- newManager tlsManagerSettings
   request       <- parseUrl "https://api.twitter.com/1.1/statuses/update.json"
   let requestForPost = urlEncodedBody [("status", encodeUtf8 message)] request
   signedRequest <- signOAuth oauth credential requestForPost
-  response      <- httpLbs signedRequest manager
-  print $ responseBody response
+  httpLbs signedRequest manager
+  return ()
 
 
 -- Fetch screenName's tweets as Timeline
