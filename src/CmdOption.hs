@@ -1,10 +1,14 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+
+-- This module for command line options specifying
+
 module CmdOption
   ( TweetOptions (..)
   , tweetOptions
   ) where
 
 import System.Console.CmdArgs
+
 
 data TweetOptions = TweetOptions
   { tweetCount :: Int

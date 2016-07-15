@@ -1,12 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
+
+-- This module for generating tweet message
+
 module Control.GoriraMeCab
   ( generateTweet
   ) where
 
-import Control.SentenceJP ( generateSentence )
+import Control.SentenceJP (generateSentence)
 import Data.GoriraTwitter
-import Data.Text ( replace )
+import Data.Text (replace)
 
+
+-- Generate sentence for twitter tweet
 generateTweet :: [TweetMessage] -> Bool -> IO TweetMessage
 generateTweet tweets allowReplying =
   case allowReplying of

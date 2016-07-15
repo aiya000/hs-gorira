@@ -7,14 +7,13 @@ module Control.GoriraTwitter
   , fetchUserTimeline
   ) where
 
-import Data.Aeson ( decode )
-import Data.ByteString.Lazy.Char8 ( unpack )
-import Data.Conduit ( ($$+-) )
+import Data.Aeson (decode)
+import Data.Conduit (($$+-))
 import Data.GoriraTwitter
-import Data.Text.Encoding ( encodeUtf8 )
-import Network.HTTP.Conduit ( newManager, parseUrl, setQueryString, http, urlEncodedBody, responseBody, tlsManagerSettings, httpLbs )
-import System.IO ( stdout )
-import Web.Authenticate.OAuth ( Credential (), signOAuth, OAuth )
+import Data.Text.Encoding (encodeUtf8)
+import Network.HTTP.Conduit (newManager, parseUrl, setQueryString, http, urlEncodedBody, responseBody, tlsManagerSettings, httpLbs)
+import System.IO (stdout)
+import Web.Authenticate.OAuth (Credential, signOAuth, OAuth)
 import qualified Data.Conduit.Binary as CBinary
 
 

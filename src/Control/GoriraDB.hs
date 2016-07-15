@@ -7,6 +7,9 @@
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
+
+-- This module for accessing application's database
+
 module Control.GoriraDB
   ( prepareGoriraDB
   , addTweetToDB
@@ -14,7 +17,7 @@ module Control.GoriraDB
   ) where
 
 import Data.GoriraTwitter
-import Data.Text ( Text )
+import Data.Text (Text)
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH

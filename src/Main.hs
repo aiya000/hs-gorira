@@ -10,7 +10,6 @@ import Control.GoriraTwitter
 import Control.Monad (forM_)
 import Data.GoriraTwitter
 import System.Console.CmdArgs (cmdArgs)
-import qualified Data.Maybe as DMaybe
 import qualified Data.Text.IO as TIO
 
 

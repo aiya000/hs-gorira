@@ -6,9 +6,9 @@ module Config
   ( readTwitterAuth
   ) where
 
-import Data.ByteString hiding ( readFile )
+import Data.ByteString hiding (readFile)
 import Data.GoriraTwitter
-import Web.Authenticate.OAuth ( OAuth (), Credential (), newCredential )
+import Web.Authenticate.OAuth (OAuth, Credential, newCredential)
 
 
 -- Read OAuth from serialized data file
@@ -37,4 +37,3 @@ readTwitterAuth = do
   accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
   return $ TwitterAuth oauth credential
-
