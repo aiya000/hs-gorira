@@ -10,9 +10,11 @@ import Control.GoriraTwitter
 import Control.Monad (forM_)
 import Data.GoriraTwitter
 import Data.Set ((\\))
+import Data.Text (pack, unpack)
 import System.Console.CmdArgs (cmdArgs)
 import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
+import qualified Text.Regex.Posix as RPosix
 
 
 -- Entry point
@@ -48,10 +50,16 @@ goriraTweet twitterAuth timeline count = do
 -- Cache "read tweets - exists records"
 cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()
 cacheFetchedTweets tweets existsTweets = do
-  let tweets' = Set.fromList tweets \\ Set.fromList existsTweets
-  forM_ tweets' $ \tweet -> do
+  let tweets'  = Set.fromList tweets \\ Set.fromList existsTweets
+  let tweets'' = ignoreReplies tweets'
+  forM_ tweets'' $ \tweet -> do
     TIO.putStrLn tweet
     addTweetToDB tweet
+  where
+    ignoreReplies :: Set.Set TweetMessage -> Set.Set TweetMessage
+    ignoreReplies = Set.map pack . Set.filter (\s -> not $ s =~ "@\\w+") . Set.map unpack
+    (=~) :: String -> String -> Bool
+    (=~) = (RPosix.=~)
 
 -- Print cought error to console
 printTweetError :: SomeException -> IO ()
