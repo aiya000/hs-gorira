@@ -39,16 +39,13 @@ dbFile = "tweets.sqlite3"
 prepareGoriraDB :: IO ()
 prepareGoriraDB = runSqlite dbFile $ runMigration migrateAll
 
+
 -- Add TweetMessage to local DB
 addTweetToDB :: TweetMessage -> IO ()
 addTweetToDB tweet = runSqlite dbFile $ do
   insert $ TweetCache tweet
   return ()
 
--- Read all record from dbFile's TweetCache table
-selectAllRecord = do
-  xs <- selectList [] []
-  return (xs :: [Entity TweetCache])
 
 -- Read [TweetMessage] from local DB
 readDBTweets :: IO [TweetMessage]
@@ -57,3 +54,5 @@ readDBTweets = do
   -- tweetCacheTweetMessage is tweetMessage
   let records' = map (tweetCacheTweetMessage . entityVal) records
   return records'
+    where
+      selectAllRecord = selectList [] [] >>= \xs -> return (xs :: [Entity TweetCache])
