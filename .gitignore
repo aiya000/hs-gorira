@@ -1,4 +1,5 @@
 .stack-work/
 resource/twitter_oauth
 resource/twitter_access_tokens
+resource/hs-gorira-config
 tweets.sqlite3

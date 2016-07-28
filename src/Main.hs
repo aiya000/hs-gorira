@@ -3,18 +3,19 @@ module Main where
 
 import CmdOption
 import Config
-import Control.Exception (SomeException, catch)
 import Control.GoriraDB
 import Control.GoriraMeCab
 import Control.GoriraTwitter
-import Control.Monad (forM_)
+import Control.Monad (forM_, when)
+import Control.Monad.Catch (SomeException, catch)
 import Data.GoriraTwitter
+import Data.GoriraTwitter.ApiTypes
 import Data.Set ((\\))
 import Data.Text (pack, unpack)
 import System.Console.CmdArgs (cmdArgs)
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
-import qualified Text.Regex.Posix as RPosix
 
 
 -- Entry point
@@ -36,30 +37,30 @@ goriraTweet twitterAuth timeline count = do
   -- Generate new tweetMessage from fetched data and DB data,
   -- and Post tweetMessage to twitter
   prepareGoriraDB
+  -- Read exists tweets
   let tweets  = map text timeline
   localMessages <- readDBTweets
   let tweets' = localMessages ++ tweets
-  forM_ [1 .. count] $ \_ -> do
-    tweetMessage <- generateTweet tweets' False
-    postTweet twitterAuth tweetMessage `catch` printTweetError
-    putStrLn "\nThis message was posted: vvv"
-    TIO.putStrLn tweetMessage
-  putStrLn "\nThese tweet to cache: vvv"
-  cacheFetchedTweets tweets localMessages
+  -- Read config
+  config <- readGoriraConfig `catch` \(IOException' msg) -> fail msg
+  case Map.lookup "allowReply" config of
+    Nothing                    -> fail "'allowReply'' was not found in config file"
+    Just (TermBool allowReply) -> do
+      forM_ [1 .. count] $ \_ -> do
+        tweetMessage <- generateTweet twitterAuth tweets' allowReply
+        postTweet twitterAuth tweetMessage `catch` printTweetError
+        putStrLn "\nThis message was posted: vvv"
+        TIO.putStrLn tweetMessage
+      putStrLn "\nThese tweet to cache: vvv"
+      cacheFetchedTweets tweets localMessages
 
 -- Cache "read tweets - exists records"
 cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()
 cacheFetchedTweets tweets existsTweets = do
-  let tweets'  = Set.fromList tweets \\ Set.fromList existsTweets
-  let tweets'' = ignoreReplies tweets'
-  forM_ tweets'' $ \tweet -> do
+  let tweets' = Set.fromList tweets \\ Set.fromList existsTweets
+  forM_ tweets' $ \tweet -> do
     TIO.putStrLn tweet
     addTweetToDB tweet
-  where
-    ignoreReplies :: Set.Set TweetMessage -> Set.Set TweetMessage
-    ignoreReplies = Set.map pack . Set.filter (\s -> not $ s =~ "@\\w+") . Set.map unpack
-    (=~) :: String -> String -> Bool
-    (=~) = (RPosix.=~)
 
 -- Print cought error to console
 printTweetError :: SomeException -> IO ()
