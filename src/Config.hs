@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
--- Module for behavior configs of hs-gorira
+-- Module for Twitter OAuth
 
 module Config
   ( readTwitterAuth
@@ -10,11 +10,8 @@ import Data.ByteString hiding (readFile)
 import Data.GoriraTwitter
 import Web.Authenticate.OAuth (OAuth, Credential, newCredential)
 
--- hs-gorira behavior data type
-type GoriraConfig = Map
 
-
--- Read Twitter OAuth from serialized data file
+-- Read OAuth from serialized data file
 readOAuth :: IO OAuth
 readOAuth = do
   oauth <- read <$> readFile "resource/twitter_oauth"
@@ -26,20 +23,17 @@ readAccessTokens = do
   accessTokens <- read <$> readFile "resource/twitter_access_tokens"
   return accessTokens
 
--- Generate credential from twitter oauth and twitter token
+-- Generate credential from oauth and token
 newCredential' :: TwitterAccessTokens -> Credential
 newCredential' accessTokens =
   let accessTokenValue       = accessToken accessTokens
       accessTokenSecretValue = accessTokenSecret accessTokens
   in newCredential accessTokenValue accessTokenSecretValue
 
--- Integrate reading Twitter Authentication data
+-- Integrate reading Authentication data
 readTwitterAuth :: IO TwitterAuth
 readTwitterAuth = do
   oauth         <- readOAuth
   accessTokens  <- readAccessTokens
   let credential = newCredential' accessTokens
   return $ TwitterAuth oauth credential
-
--- Read general config
-readGoriraConfig
