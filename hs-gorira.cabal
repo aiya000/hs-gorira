@@ -15,14 +15,16 @@ cabal-version:       >=1.10
 executable hs-gorira
   hs-source-dirs:      src
   main-is:             Main.hs
-  other-modules:       Config
-                     , CmdOption
+  other-modules:       CmdOption
+                     , Control.Config
                      , Control.GoriraDB
                      , Control.GoriraMeCab
                      , Control.GoriraTwitter
+                     , Data.Config
                      , Data.GoriraTwitter
                      , Data.GoriraTwitter.ApiTypes.Followers
                      , Data.GoriraTwitter.ApiTypes.Statuses
+                     , Data.MyException
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                      , HTTP

@@ -2,13 +2,15 @@
 module Main where
 
 import CmdOption
-import Config
+import Control.Config
 import Control.GoriraDB
 import Control.GoriraMeCab
 import Control.GoriraTwitter
 import Control.Monad (forM_, when)
 import Control.Monad.Catch (SomeException, catch, try)
+import Data.Config
 import Data.GoriraTwitter
+import Data.MyException
 import Data.Set ((\\))
 import Data.Text (pack, unpack)
 import System.Console.CmdArgs (cmdArgs)

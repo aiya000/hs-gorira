@@ -6,13 +6,13 @@ module Control.GoriraMeCab
   ( generateTweet
   ) where
 
-import Config
 import Control.GoriraTwitter
 import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
 import Control.SentenceJP (generateSentence)
 import Data.GoriraTwitter
+import Data.MyException
 import Data.Text (Text)
 import qualified Data.GoriraTwitter.ApiTypes.Followers as Followers
 import qualified Data.Text as T
