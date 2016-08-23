@@ -13,8 +13,8 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
 import Control.SentenceJP (generateSentence)
 import Data.GoriraTwitter
-import Data.GoriraTwitter.ApiTypes
 import Data.Text (Text)
+import qualified Data.GoriraTwitter.ApiTypes.Followers as Followers
 import qualified Data.Text as T
 import qualified Text.Regex.Posix as Regex
 
@@ -31,7 +31,7 @@ generateTweet auth tweets allowReply
       -- Generate sentence but ignore reply to not followers
       generateSentenceWithFilter :: (MonadThrow m, MonadIO m) => TwitterAuth -> [TweetMessage] -> m TweetMessage
       generateSentenceWithFilter auth tweets = do
-        maybeScreenNames <- liftIO $ fmap (map followersListUsersScreenName . followersListUsers) <$> fetchFollowersList auth "aiya_gorira"
+        maybeScreenNames <- liftIO $ fmap (map Followers.listUsersScreenName . Followers.listUsers) <$> fetchFollowersList auth "aiya_gorira"
         sentence         <- generateSentence tweets
         case isReplyTweet $ T.unpack sentence of
           False -> return sentence

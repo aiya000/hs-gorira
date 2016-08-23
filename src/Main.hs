@@ -9,10 +9,10 @@ import Control.GoriraTwitter
 import Control.Monad (forM_, when)
 import Control.Monad.Catch (SomeException, catch, try)
 import Data.GoriraTwitter
-import Data.GoriraTwitter.ApiTypes
 import Data.Set ((\\))
 import Data.Text (pack, unpack)
 import System.Console.CmdArgs (cmdArgs)
+import qualified Data.GoriraTwitter.ApiTypes.Statuses as Statuses
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
@@ -32,13 +32,13 @@ main = do
       goriraTweet twitterAuth timeline count
 
 -- Body of tweet logic
-goriraTweet :: TwitterAuth -> Timeline -> Int -> IO ()
+goriraTweet :: TwitterAuth -> Statuses.UserTimeline -> Int -> IO ()
 goriraTweet twitterAuth timeline count = do
   -- Generate new tweetMessage from fetched data and DB data,
   -- and Post tweetMessage to twitter
   prepareGoriraDB
   -- Read exists tweets
-  let tweets  = map text timeline
+  let tweets  = map Statuses.userTimelineItemText timeline
   localMessages <- readDBTweets
   let tweets' = localMessages ++ tweets
   -- Read config
