@@ -35,12 +35,12 @@ httpsTwitterRequestWithParamsTo (TwitterAuth oauth credential) url params = do
 
 
 -- Post a tweet
--- and return posted tweet message if succeed
-postTweet :: TwitterAuth -> TweetMessage -> IO ()
+-- and return posted tweet message
+postTweet :: TwitterAuth -> TweetMessage -> IO TweetMessage
 postTweet auth message = do
   let urlParams = [("status", Just $ encodeUtf8 message)]
   httpsTwitterRequestWithParamsTo auth "https://api.twitter.com/1.1/statuses/update.json" urlParams
-  return ()
+  return message
 
 
 -- Fetch {screenName}'s tweets as Timeline

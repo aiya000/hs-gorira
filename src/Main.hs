@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 module Main where
 
 import CmdOption
@@ -7,7 +7,7 @@ import Control.GoriraDB
 import Control.GoriraMeCab
 import Control.GoriraTwitter
 import Control.Monad (forM_, when)
-import Control.Monad.Catch (SomeException, catch)
+import Control.Monad.Catch (SomeException, catch, try)
 import Data.GoriraTwitter
 import Data.GoriraTwitter.ApiTypes
 import Data.Set ((\\))
@@ -48,9 +48,7 @@ goriraTweet twitterAuth timeline count = do
     Just (TermBool allowReply) -> do
       forM_ [1 .. count] $ \_ -> do
         tweetMessage <- generateTweet twitterAuth tweets' allowReply
-        postTweet twitterAuth tweetMessage `catch` printTweetError
-        putStrLn "\nThis message was posted: vvv"
-        TIO.putStrLn tweetMessage
+        printPostResult =<< (try $ postTweet twitterAuth tweetMessage)
       putStrLn "\nThese tweet to cache: vvv"
       cacheFetchedTweets tweets localMessages
 
@@ -62,8 +60,11 @@ cacheFetchedTweets tweets existsTweets = do
     TIO.putStrLn tweet
     addTweetToDB tweet
 
--- Print cought error to console
-printTweetError :: SomeException -> IO ()
-printTweetError e = do
+-- Print succeed or failed detail
+printPostResult :: Either SomeException TweetMessage -> IO ()
+printPostResult (Left e) = do
   putStrLn "\nhs-gorira cought tweeting error: vvv"
   print e
+printPostResult (Right a) = do
+  putStrLn "\nThis message was posted: vvv"
+  TIO.putStrLn a
