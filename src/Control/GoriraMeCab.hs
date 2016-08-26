@@ -7,7 +7,7 @@ module Control.GoriraMeCab
   ) where
 
 import Control.GoriraTwitter
-import Control.Monad.Catch (MonadThrow, throwM)
+import Control.Monad.Catch (MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
 import Control.SentenceJP (generateSentence)
@@ -23,13 +23,13 @@ type TwitterScreenName' = String
 
 
 -- Generate sentence for twitter tweet
-generateTweet :: (MonadThrow m, MonadIO m) => TwitterAuth -> [TweetMessage] -> Bool -> m TweetMessage
+generateTweet :: (MonadCatch m, MonadIO m) => TwitterAuth -> [TweetMessage] -> Bool -> m TweetMessage
 generateTweet auth tweets allowReply
   | allowReply = generateSentenceWithFilter auth tweets
   | otherwise  = generateSentenceWithoutReplying tweets
     where
       -- Generate sentence but ignore reply to not followers
-      generateSentenceWithFilter :: (MonadThrow m, MonadIO m) => TwitterAuth -> [TweetMessage] -> m TweetMessage
+      generateSentenceWithFilter :: (MonadCatch m, MonadIO m) => TwitterAuth -> [TweetMessage] -> m TweetMessage
       generateSentenceWithFilter auth tweets = do
         maybeScreenNames <- liftIO $ fmap (map Followers.listUsersScreenName . Followers.listUsers) <$> fetchFollowersList auth "aiya_gorira"
         sentence         <- generateSentence tweets

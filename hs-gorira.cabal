@@ -35,6 +35,7 @@ executable hs-gorira
                      , connection
                      , containers
                      , directory
+                     , either
                      , exceptions
                      , http-client
                      , http-client-tls

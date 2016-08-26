@@ -37,6 +37,7 @@ httpsTwitterRequestWithParamsTo (TwitterAuth oauth credential) url params = do
 
 -- Post a tweet
 -- and return posted tweet message
+--TODO: vvv
 --postTweet :: TwitterAuth -> TweetMessage -> IO (Maybe Statuses.Update)
 postTweet :: TwitterAuth -> TweetMessage -> IO TweetMessage
 postTweet auth message = do
