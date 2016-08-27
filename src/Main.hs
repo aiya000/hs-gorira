@@ -1,5 +1,4 @@
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
@@ -46,14 +45,14 @@ goriraTweet twitterAuth timeline count = do
   let tweets  = map Statuses.userTimelineItemText timeline
   localMessages <- readDBTweets
   let tweets' = localMessages ++ tweets
+  -- Append read tweets to DB
+  putStrLn "\nThese tweet to cache: vvv"
+  cacheFetchedTweets tweets localMessages
   -- Read config
   config <- readGoriraConfig `catch` \(IOException' msg) -> fail msg
   case Map.lookup "allowReply" config of
     Nothing                    -> putStrLn "'allowReply'' was not found in config file"
-    Just (TermBool allowReply) -> do
-      tweetLoop twitterAuth tweets' count allowReply
-      putStrLn "\nThese tweet to cache: vvv"
-      cacheFetchedTweets tweets localMessages
+    Just (TermBool allowReply) -> tweetLoop twitterAuth tweets' count allowReply
 
 -- X(
 tweetLoop :: TwitterAuth -> [TweetMessage] -> Int -> Bool -> IO ()
@@ -61,8 +60,8 @@ tweetLoop twitterAuth tweets' count allowReply = do
   forM_ [1 .. count] $ \_ -> do
     eitherTweetMessage <- runEitherT $ generateTweet twitterAuth tweets' allowReply
     case eitherTweetMessage of
-      Left (e :: SomeException) -> putStrLn $ "hs-gorira caught an error: " ++ show e
-      Right tweetMessage        -> try (postTweet twitterAuth tweetMessage) >>= printPostResult
+      Left e             -> putStrLn $ "hs-gorira caught an error: " ++ show (e :: SomeException)
+      Right tweetMessage -> try (postTweet twitterAuth tweetMessage) >>= printPostResult
 
 -- Cache "read tweets - exists records"
 cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()
