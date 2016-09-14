@@ -54,7 +54,7 @@ goriraTweet twitterAuth timeline count = do
     Nothing                    -> putStrLn "'allowReply'' was not found in config file"
     Just (TermBool allowReply) -> tweetLoop twitterAuth tweets' count allowReply
 
--- X(
+-- :P
 tweetLoop :: TwitterAuth -> [TweetMessage] -> Int -> Bool -> IO ()
 tweetLoop twitterAuth tweets' count allowReply = do
   forM_ [1 .. count] $ \_ -> do

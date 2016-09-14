@@ -42,6 +42,7 @@ executable hs-gorira
                      , persistent
                      , persistent-sqlite
                      , persistent-template
+                     , regex-applicative-text
                      , regex-posix
                      , sentence-jp
                      , text
