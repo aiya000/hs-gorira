@@ -7,7 +7,7 @@ module Control.Config
   , readGoriraConfig
   ) where
 
-import Control.Monad.Catch (MonadCatch, throwM)
+import Control.Monad.Catch (MonadCatch, MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Config
 import Data.GoriraTwitter
@@ -17,7 +17,7 @@ import Web.Authenticate.OAuth (OAuth, Credential, newCredential)
 
 
 -- Integrate reading Twitter Authentication data
-readTwitterAuth :: IO TwitterAuth
+readTwitterAuth :: (MonadThrow m, MonadIO m) => m TwitterAuth
 readTwitterAuth = do
   oauth         <- readOAuth
   accessTokens  <- readAccessTokens
@@ -25,16 +25,18 @@ readTwitterAuth = do
   return $ TwitterAuth oauth credential
     where
       -- Read Twitter OAuth from serialized data file
-      readOAuth :: IO OAuth
+      readOAuth :: (MonadThrow m, MonadIO m) => m OAuth
       readOAuth = do
-        oauth <- read <$> readFile "resource/twitter_oauth"
-        return oauth
+        x <- liftIO $ doesFileExist "resource/twitter_oauth"
+        if x then liftIO $ read <$> readFile "resource/twitter_oauth"
+             else throwM $ IOException' "'resource/twitter_oauth' is not exists"
 
       -- Read Twitter AccessTokens from serialized data file
-      readAccessTokens :: IO TwitterAccessTokens
+      readAccessTokens :: (MonadThrow m, MonadIO m) => m TwitterAccessTokens
       readAccessTokens = do
-        accessTokens <- read <$> readFile "resource/twitter_access_tokens"
-        return accessTokens
+        x <- liftIO $ doesFileExist "resource/twitter_access_tokens"
+        if x then liftIO $ read <$> readFile "resource/twitter_access_tokens"
+             else throwM $ IOException' "'resource/twitter_access_tokens' is not exists"
 
       -- Generate credential from twitter oauth and twitter token
       newCredential' :: TwitterAccessTokens -> Credential

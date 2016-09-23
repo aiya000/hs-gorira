@@ -25,7 +25,13 @@ import qualified Data.Text.IO as TIO
 -- Entry point
 main :: IO ()
 main = do
-  twitterAuth   <- readTwitterAuth
+  eitherTwitterAuth <- runEitherT readTwitterAuth
+  case eitherTwitterAuth of
+    Left  e           -> fail e
+    Right twitterAuth -> phaseOfFetchingUserTimeline twitterAuth
+
+phaseOfFetchingUserTimeline :: TwitterAuth -> IO ()
+phaseOfFetchingUserTimeline twitterAuth = do
   maybeTimeline <- fetchUserTimeline twitterAuth "aiya_000"
   case maybeTimeline of
     Nothing       -> fail "failed fetching tweets"
