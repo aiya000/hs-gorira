@@ -47,3 +47,4 @@ executable hs-gorira
                      , sentence-jp
                      , text
                      , transformers
+                     , unix

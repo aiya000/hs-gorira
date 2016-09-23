@@ -16,7 +16,10 @@ import System.Directory (doesFileExist)
 import Web.Authenticate.OAuth (OAuth, Credential, newCredential)
 
 
--- Integrate reading Twitter Authentication data
+-- Integrate reading Twitter Authentication data.
+-- Read from ./resource/{twitter_oauth,twitter_access_tokens}
+-- or value of $GORIRA_OAUTH and $GORIRA_ACCESS_TOKENS.
+-- See ./resource/{twitter_oauth,twitter_access_tokens}.example
 readTwitterAuth :: (MonadThrow m, MonadIO m) => m TwitterAuth
 readTwitterAuth = do
   oauth         <- readOAuth
