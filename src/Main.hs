@@ -38,36 +38,39 @@ phaseOfFetchingUserTimeline twitterAuth = do
     Just timeline -> do
       -- Get cmd argument values
       options <- cmdArgs tweetOptions
-      let count = tweetCount options
-      goriraTweet twitterAuth timeline count
+      let count  = tweetCount options
+      let tweets = map Statuses.userTimelineItemText timeline
+      phaseOfCaching twitterAuth tweets count
 
--- Body of tweet logic
-goriraTweet :: TwitterAuth -> Statuses.UserTimeline -> Int -> IO ()
-goriraTweet twitterAuth timeline count = do
+phaseOfCaching :: TwitterAuth -> [TweetMessage] -> Int -> IO ()
+phaseOfCaching twitterAuth tweets count = do
   -- Generate new tweetMessage from fetched data and DB data,
   -- and Post tweetMessage to twitter
   prepareGoriraDB
   -- Read exists tweets
-  let tweets  = map Statuses.userTimelineItemText timeline
   localMessages <- readDBTweets
   let tweets' = localMessages ++ tweets
   -- Append read tweets to DB
   putStrLn "\nThese tweet to cache: vvv"
   cacheFetchedTweets tweets localMessages
   -- Read config
-  config <- readGoriraConfig `catch` \(IOException' msg) -> fail msg
-  case Map.lookup "allowReply" config of
-    Nothing                    -> putStrLn "'allowReply'' was not found in config file"
-    Just (TermBool allowReply) -> tweetLoop twitterAuth tweets' count allowReply
+  eitherConfig <- runEitherT readGoriraConfig
+  case eitherConfig of
+    Left  e      -> fail e
+    Right config -> phaseOfTweeting twitterAuth tweets' count config
 
--- :P
-tweetLoop :: TwitterAuth -> [TweetMessage] -> Int -> Bool -> IO ()
-tweetLoop twitterAuth tweets' count allowReply = do
-  forM_ [1 .. count] $ \_ -> do
-    eitherTweetMessage <- runEitherT $ generateTweet twitterAuth tweets' allowReply
-    case eitherTweetMessage of
-      Left e             -> putStrLn $ "hs-gorira caught an error: " ++ show (e :: SomeException)
-      Right tweetMessage -> try (postTweet twitterAuth tweetMessage) >>= printPostResult
+phaseOfTweeting :: TwitterAuth -> [TweetMessage] -> Int -> GoriraConfig -> IO ()
+phaseOfTweeting twitterAuth tweets count config =
+  case Map.lookup "allowReply" config of
+    Nothing                    -> fail "'allowReply'' is not exists in the config file"
+    Just (TermBool allowReply) -> forM_ [1 .. count] $ \_ -> tweeting twitterAuth tweets allowReply
+    Just x                     -> fail $ "caught unknowned term: " ++ show x
+  where
+    tweeting twitterAuth tweets allowReply = do
+      eitherTweetMessage <- runEitherT $ generateTweet twitterAuth tweets allowReply
+      case eitherTweetMessage of
+        Left  e            -> putStrLn $ "caught an error: " ++ show (e :: SomeException)
+        Right tweetMessage -> try (postTweet twitterAuth tweetMessage) >>= printPostResult
 
 -- Cache "read tweets - exists records"
 cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()

@@ -7,7 +7,7 @@ module Control.Config
   , readGoriraConfig
   ) where
 
-import Control.Monad.Catch (MonadCatch, MonadThrow, throwM)
+import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Config
 import Data.GoriraTwitter
@@ -46,16 +46,13 @@ readTwitterAuth = do
         in newCredential accessTokenValue accessTokenSecretValue
 
 
-goriraConfigFilePath :: FilePath
-goriraConfigFilePath = "resource/hs-gorira-config"
-
 -- Read general config of hs-gorira
-readGoriraConfig :: (MonadCatch m, MonadIO m) => m GoriraConfig
+readGoriraConfig :: (MonadThrow m, MonadIO m) => m GoriraConfig
 readGoriraConfig = do
-  b <- liftIO $ doesFileExist goriraConfigFilePath
-  if b then read <$> (liftIO $ readFile goriraConfigFilePath)
-       else throwM $ IOException' "config file is not found"
+  x <- liftIO $ doesFileExist "resource/hs-gorira-config"
+  if x then liftIO $ read <$> readFile "resource/hs-gorira-config"
+       else throwM $ IOException' "'resource/hs-gorira-config' is not exists"
 
 ---- Save general config of hs-gorira
 --writeGoriraConfig :: GoriraConfig -> IO ()
---writeGoriraConfig config = writeFile goriraConfigFilePath $ show config
+--writeGoriraConfig config = writeFile "resource/hs-gorira-config" $ show config
