@@ -37,6 +37,7 @@ executable hs-gorira
                      , directory
                      , either
                      , exceptions
+                     , extra
                      , http-client
                      , http-client-tls
                      , persistent
@@ -47,3 +48,4 @@ executable hs-gorira
                      , sentence-jp
                      , text
                      , transformers
+                     , unix

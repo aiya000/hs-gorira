@@ -8,11 +8,13 @@ module Control.Config
   ) where
 
 import Control.Monad.Catch (MonadThrow, throwM)
+import Control.Monad.Extra (ifM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Config
 import Data.GoriraTwitter
 import Data.MyException
 import System.Directory (doesFileExist)
+import System.Posix.Env (getEnv)
 import Web.Authenticate.OAuth (OAuth, Credential, newCredential)
 
 
@@ -24,19 +26,27 @@ readTwitterAuth = do
   let credential = newCredential' accessTokens
   return $ TwitterAuth oauth credential
     where
-      -- Read Twitter OAuth from serialized data file
+      -- Read Twitter OAuth
+      -- from ./resource/twitter_oauth file or $HS_GORIRA_OAUTH value
       readOAuth :: (MonadThrow m, MonadIO m) => m OAuth
       readOAuth = do
-        x <- liftIO $ doesFileExist "resource/twitter_oauth"
-        if x then liftIO $ read <$> readFile "resource/twitter_oauth"
-             else throwM $ IOException' "'resource/twitter_oauth' is not exists"
+        maybeOAuth <- liftIO $ getEnv "HS_GORIRA_OAUTH"
+        case maybeOAuth of
+          Just oauth -> return $ read oauth
+          Nothing    -> ifM (liftIO $ doesFileExist "resource/twitter_oauth")
+                          (liftIO $ read <$> readFile "resource/twitter_oauth")
+                          (throwM $ IOException' "You must set $HS_GORIRA_OAUTH or create ./resource/twitter_oauth")
 
-      -- Read Twitter AccessTokens from serialized data file
+      -- Read Twitter AccessTokens
+      -- from ./resource/twitter_access_tokens file or $HS_GORIRA_ACCESS_TOKENS value
       readAccessTokens :: (MonadThrow m, MonadIO m) => m TwitterAccessTokens
       readAccessTokens = do
-        x <- liftIO $ doesFileExist "resource/twitter_access_tokens"
-        if x then liftIO $ read <$> readFile "resource/twitter_access_tokens"
-             else throwM $ IOException' "'resource/twitter_access_tokens' is not exists"
+        maybeAccessTokens <- liftIO $ getEnv "HS_GORIRA_ACCESS_TOKENS"
+        case maybeAccessTokens of
+          Just accessTokens -> return $ read accessTokens
+          Nothing           -> ifM (liftIO $ doesFileExist "resource/twitter_access_tokens")
+                                 (liftIO $ read <$> readFile "resource/twitter_access_tokens")
+                                 (throwM $ IOException' "You must set $HS_GORIRA_ACCESS_TOKENS or create ./resource/twitter_access_tokens")
 
       -- Generate credential from twitter oauth and twitter token
       newCredential' :: TwitterAccessTokens -> Credential
@@ -47,12 +57,12 @@ readTwitterAuth = do
 
 
 -- Read general config of hs-gorira
+-- from ./resource/hs-gorira-config file or $HS_GORIRA_CONFIG value
 readGoriraConfig :: (MonadThrow m, MonadIO m) => m GoriraConfig
 readGoriraConfig = do
-  x <- liftIO $ doesFileExist "resource/hs-gorira-config"
-  if x then liftIO $ read <$> readFile "resource/hs-gorira-config"
-       else throwM $ IOException' "'resource/hs-gorira-config' is not exists"
-
----- Save general config of hs-gorira
---writeGoriraConfig :: GoriraConfig -> IO ()
---writeGoriraConfig config = writeFile "resource/hs-gorira-config" $ show config
+  maybeConfig <- liftIO $ getEnv "HS_GORIRA_CONFIG"
+  case maybeConfig of
+    Just config -> return $ read config
+    Nothing     -> ifM (liftIO $ doesFileExist "resource/hs-gorira-config")
+                     (liftIO $ read <$> readFile "resource/hs-gorira-config")
+                     (throwM $ IOException' "You must set $HS_GORIRA_CONFIG or create ./resource/hs-gorira-config")
