@@ -13,6 +13,9 @@ packages:
 - location:
     git: https://github.com/aiya000/hs-sentence-jp.git
     commit: cb1212e11c722cc8062b3d8430cfad49b4673621
+- location:
+    git: https://github.com/aiya000/hs-twi-high.git
+    commit: 0fb25ead1af4738e47b5fd159cb94bbf0fd69665
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps: []
 

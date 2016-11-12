@@ -16,8 +16,8 @@ module Control.GoriraDB
   , readDBTweets
   ) where
 
-import Data.GoriraTwitter
 import Data.Text (Text)
+import Data.TwiHigh
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH

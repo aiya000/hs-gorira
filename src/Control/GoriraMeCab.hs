@@ -6,18 +6,17 @@ module Control.GoriraMeCab
   ( generateTweet
   ) where
 
-import Control.GoriraTwitter
 import Control.Monad.Catch (MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
 import Control.SentenceJP (generateSentence)
-import Data.GoriraTwitter
 import Data.Maybe (fromJust)
 import Data.MyException
 import Data.Text (Text)
+import Data.TwiHigh
 import Text.Regex.Applicative.Text (RE', (<|>))
-import qualified Data.GoriraTwitter.ApiTypes.Followers as Followers
 import qualified Data.Text as T
+import qualified Data.TwiHigh.Followers as Followers
 import qualified Text.Regex.Applicative.Text as RT
 import qualified Text.Regex.Posix as Regex
 
@@ -34,7 +33,7 @@ generateTweet auth tweets allowReply
       -- Generate sentence but ignore reply to not followers
       generateSentenceWithFilter :: (MonadCatch m, MonadIO m) => TwitterAuth -> [TweetMessage] -> m TweetMessage
       generateSentenceWithFilter auth tweets = do
-        maybeScreenNames <- liftIO $ fmap (map Followers.listUsersScreenName . Followers.listUsers) <$> fetchFollowersList auth "aiya_gorira"
+        maybeScreenNames <- liftIO $ fmap (map Followers.listUsersScreenName . Followers.listUsers) <$> Followers.fetchFollowersList auth "aiya_gorira"
         sentence         <- generateSentence tweets
         case isReplyTweet sentence of
           False -> return sentence

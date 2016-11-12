@@ -11,8 +11,8 @@ import Control.Monad.Catch (MonadThrow, throwM)
 import Control.Monad.Extra (ifM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Config
-import Data.GoriraTwitter
 import Data.MyException
+import Data.TwiHigh
 import System.Directory (doesFileExist)
 import System.Posix.Env (getEnv)
 import Web.Authenticate.OAuth (OAuth, Credential, newCredential)

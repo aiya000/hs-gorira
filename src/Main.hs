@@ -6,20 +6,19 @@ import CmdOption
 import Control.Config
 import Control.GoriraDB
 import Control.GoriraMeCab
-import Control.GoriraTwitter
 import Control.Monad (forM_, when)
 import Control.Monad.Catch (SomeException, catch, try)
 import Control.Monad.Trans.Either (runEitherT)
 import Data.Config
-import Data.GoriraTwitter
 import Data.MyException
 import Data.Set ((\\))
 import Data.Text (pack, unpack)
+import Data.TwiHigh
 import System.Console.CmdArgs (cmdArgs)
-import qualified Data.GoriraTwitter.ApiTypes.Statuses as Statuses
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
+import qualified Data.TwiHigh.Statuses as Statuses
 
 
 -- Entry point
@@ -32,7 +31,11 @@ main = do
 
 phaseOfFetchingUserTimeline :: TwitterAuth -> IO ()
 phaseOfFetchingUserTimeline twitterAuth = do
-  maybeTimeline <- fetchUserTimeline twitterAuth "aiya_000"
+  let urlParams = [ ("include_rts", Just "false")
+                  , ("count",       Just "80")
+                  , ("screen_name", Just "aiya_000")
+                  ]
+  maybeTimeline <- Statuses.fetchUserTimeline twitterAuth "aiya_000" urlParams
   case maybeTimeline of
     Nothing       -> fail "failed fetching tweets"
     Just timeline -> do
@@ -70,7 +73,7 @@ phaseOfTweeting twitterAuth tweets count config =
       eitherTweetMessage <- runEitherT $ generateTweet twitterAuth tweets allowReply
       case eitherTweetMessage of
         Left  e            -> putStrLn $ "caught an error: " ++ show (e :: SomeException)
-        Right tweetMessage -> try (postTweet twitterAuth tweetMessage) >>= printPostResult
+        Right tweetMessage -> try (Statuses.postTweet twitterAuth tweetMessage) >>= printPostResult
 
 -- Cache "read tweets - exists records"
 cacheFetchedTweets :: [TweetMessage] -> [TweetMessage] -> IO ()
