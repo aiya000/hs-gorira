@@ -9,7 +9,7 @@ module Control.GoriraMeCab
 import Control.Monad.Catch (MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
-import Control.SentenceJP (generateSentence)
+import Control.SentenceJP (generateMessage, GenerateOption (IgnoreSigns, IgnoreAlphaNums))
 import Data.Maybe (fromJust)
 import Data.MyException
 import Data.Text (Text)
@@ -23,6 +23,9 @@ import qualified Text.Regex.Posix as Regex
 -- Temporary fake name in this source
 type TwitterScreenName' = String
 
+sentenceOptions :: [GenerateOption]
+sentenceOptions = [IgnoreSigns, IgnoreAlphaNums]
+
 
 -- Generate sentence for twitter tweet
 generateTweet :: (MonadCatch m, MonadIO m) => TwitterAuth -> [TweetMessage] -> Bool -> m TweetMessage
@@ -34,13 +37,15 @@ generateTweet auth tweets allowReply
       generateSentenceWithFilter :: (MonadCatch m, MonadIO m) => TwitterAuth -> [TweetMessage] -> m TweetMessage
       generateSentenceWithFilter auth tweets = do
         maybeScreenNames <- liftIO $ fmap (map Followers.listUsersScreenName . Followers.listUsers) <$> Followers.fetchFollowersList auth "aiya_gorira"
-        sentence         <- generateSentence tweets
-        case isReplyTweet sentence of
-          False -> return sentence
-          True  -> case isReplyTo <$> maybeScreenNames <*> (Just sentence) of
-                        Just True  -> return $ beExplicitReply $ sentence
-                        Just False -> return $ regulateReply . beExplicitReply $ sentence
-                        Nothing    -> throwM $ IOException' "fetching followers list was failed"
+        sentence         <- liftIO $ generateMessage sentenceOptions tweets
+        case sentence of
+          Left  e -> throwM $ MessageGenerationException $ "message generating is failure: " ++ e
+          Right a -> if isReplyTweet a
+            then return a
+            else case isReplyTo <$> maybeScreenNames <*> (Just a) of
+                      Nothing    -> throwM $ IOException' "fetching followers list was failed"
+                      Just True  -> return $ beExplicitReply a
+                      Just False -> return $ regulateReply . beExplicitReply $ a
 
       (=~#) :: Text -> RE' [Char] -> Bool
       txt =~# regex = case txt RT.=~ regex of
@@ -91,7 +96,9 @@ generateTweet auth tweets allowReply
                                                     in RT.replace regex msg
 
       -- Generate sentence but ignore reply message
-      generateSentenceWithoutReplying :: MonadIO m => [TweetMessage] -> m TweetMessage
+      generateSentenceWithoutReplying :: (MonadCatch m, MonadIO m) => [TweetMessage] -> m TweetMessage
       generateSentenceWithoutReplying tweets = do
-          sentence <- generateSentence tweets
-          return $ regulateReply sentence
+        sentence <- liftIO $ generateMessage sentenceOptions tweets
+        case sentence of
+          Left  e -> throwM $ MessageGenerationException $ "message generating is failure: " ++ e
+          Right a -> return $ regulateReply a
