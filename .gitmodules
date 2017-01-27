@@ -1,0 +1,3 @@
+[submodule "hs-sentence-jp"]
+	path = hs-sentence-jp
+	url = https://github.com/aiya000/hs-sentence-jp
