@@ -9,7 +9,7 @@ module Control.GoriraMeCab
 import Control.Monad.Catch (MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Maybe (MaybeT)
-import Control.SentenceJP (generateMessage, GenerateOption (IgnoreSigns, IgnoreAlphaNums))
+import Data.Sentence.Japanese (generateMessage, GenerateOption (IgnoreSigns, IgnoreAlphaNums))
 import Data.Maybe (fromJust)
 import Data.MyException
 import Data.Text (Text)
