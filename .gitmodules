@@ -1,3 +1,9 @@
 [submodule "hs-sentence-jp"]
 	path = hs-sentence-jp
 	url = https://github.com/aiya000/hs-sentence-jp
+[submodule "hsmecab"]
+	path = hsmecab
+	url = https://github.com/aiya000/hsmecab
+[submodule "hs-twi-high"]
+	path = hs-twi-high
+	url = https://github.com/aiya000/hs-twi-high
