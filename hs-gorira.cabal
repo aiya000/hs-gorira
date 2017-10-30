@@ -32,11 +32,13 @@ executable hs-gorira
                      , either
                      , exceptions
                      , extra
+                     , monad-logger
                      , persistent
                      , persistent-sqlite
                      , persistent-template
                      , regex-applicative-text
                      , regex-posix
+                     , resourcet
                      , sentence-jp
                      , text
                      , transformers

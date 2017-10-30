@@ -16,11 +16,18 @@ module Control.GoriraDB
   , readDBTweets
   ) where
 
+import Control.Monad (void)
+import Control.Monad.Logger (NoLoggingT)
+import Control.Monad.Trans.Reader (ReaderT)
+import Control.Monad.Trans.Resource (ResourceT)
 import Data.Text (Text)
 import Data.TwiHigh
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
+
+-- | A monad to write data to sqlite
+type Sqlite a = ReaderT SqlBackend (NoLoggingT (ResourceT IO)) a
 
 
 -- Define data type and function dynamically
@@ -42,17 +49,18 @@ prepareGoriraDB = runSqlite dbFile $ runMigration migrateAll
 
 -- Add TweetMessage to local DB
 addTweetToDB :: TweetMessage -> IO ()
-addTweetToDB tweet = runSqlite dbFile $ do
-  insert $ TweetCache tweet
-  return ()
+addTweetToDB = runSqlite dbFile . void' . insert . TweetCache
+  where
+    void' :: Sqlite a -> Sqlite ()
+    void' = void
 
 
 -- Read [TweetMessage] from local DB
 readDBTweets :: IO [TweetMessage]
 readDBTweets = do
-  records <- runSqlite dbFile $ selectAllRecord
+  records <- runSqlite dbFile selectAllRecord
   -- tweetCacheTweetMessage is tweetMessage
-  let records' = map (tweetCacheTweetMessage . entityVal) records
-  return records'
+  return $ map (tweetCacheTweetMessage . entityVal) records
     where
-      selectAllRecord = selectList [] [] >>= \xs -> return (xs :: [Entity TweetCache])
+      selectAllRecord :: Sqlite [Entity TweetCache]
+      selectAllRecord = selectList [] []
