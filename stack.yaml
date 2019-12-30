@@ -1,10 +1,13 @@
-resolver: lts-9.2
+resolver: lts-14.15
 packages:
-- '.'
-- location: './hsmecab'
-- location: './hs-twi-high'
-- location: './hs-sentence-jp'
-extra-deps: []
+  - .
+extra-deps:
+  - git: https://github.com/aiya000/hsmecab
+    commit: 40b990637fe10d0a9911b26df1c2b91deb152c6e
+  - git: https://github.com/aiya000/hs-twi-high
+    commit: f6ef989fa6994f8d396da2a777e88b497aba9b2c
+  - git: https://github.com/aiya000/hs-sentence-jp
+    commit: f9ae60679f75c5e2db34ae6d70d0f4943196b8fa
 flags: {}
 extra-package-dbs: []
 extra-include-dirs: [/app/.linuxbrew/include]
